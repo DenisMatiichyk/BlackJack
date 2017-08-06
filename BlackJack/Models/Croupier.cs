@@ -12,19 +12,17 @@ namespace BlackJack.Models
     {
         public Croupier(int nameIndex)
         {
-            Name = CrupierNames[nameIndex];
+            Name = ((CroupierNamesEnum)nameIndex).ToString();
         }
-
-        public string[] CrupierNames { get; } = new[]
-          {
-            "John", "Sindy", "Bill", "Leo"
-        };
-
-
         
-
-     
-
+        private enum CroupierNamesEnum
+        {
+            John,
+            Sindy,
+            Bill,
+            Leo
+        }
+        
         public int Think()
         {
             var takenCards = 0;
@@ -56,7 +54,7 @@ namespace BlackJack.Models
         }
 
 
-        public string ComparePoints(int clientPoints)
+        public string ComparePoints(int clientPoints) //1 enum state?
         {
             var croupierPoints = CalculatePoints();
 
@@ -70,7 +68,7 @@ namespace BlackJack.Models
                 return "PUSH!";
             }
 
-            return "LOSE!";
+            return "LOSE!"; 
         }
 
     }

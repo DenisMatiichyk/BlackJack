@@ -62,10 +62,12 @@
   <ItemGroup>
     <Compile Include="Core\Game.cs" />
     <Compile Include="Models\Card.cs" />
+    <Compile Include="Models\CardNamesEnum.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\Croupier.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Models\Statistic.cs" />
+    <Compile Include="Models\SuitEnum.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

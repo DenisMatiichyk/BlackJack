@@ -24,8 +24,9 @@ namespace BlackJack.Core
         {
             var deck = new List<Card>();
             var valuesIndex = 2;
-            string[] cardNames = new[] { "J", "Q", "K", "T" };
-            string[] suitNames = { "Hearts", "Diamonds", "Clubs", "Spades" };
+           
+            
+
 
             //2,3,4,5,6,7,8,9,10
             for (int i = 0; i < 9; i++)
@@ -36,7 +37,7 @@ namespace BlackJack.Core
                         new Card()
                         {
                             Name = valuesIndex.ToString(),
-                            Suit = suitNames[j],
+                            Suit = ((SuitEnum)j).ToString(),
                             Value = valuesIndex
 
                         }
@@ -51,12 +52,12 @@ namespace BlackJack.Core
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    if (cardNames[j] != "T")
+                    if (((CardNamesEnum)j) != CardNamesEnum.T)
                     {
                         deck.Add(new Card()
                         {
-                            Name = cardNames[j],
-                            Suit = suitNames[j],
+                            Name = ((CardNamesEnum)j).ToString(),
+                            Suit = ((SuitEnum)j).ToString(),
                             Value = 10
 
 
@@ -67,8 +68,8 @@ namespace BlackJack.Core
                     {
                         deck.Add(new Card()
                         {
-                            Name = cardNames[j],
-                            Suit = suitNames[j],
+                            Name = ((CardNamesEnum)j).ToString(),
+                            Suit = ((SuitEnum)j).ToString(),
                             Value = 11
 
 
@@ -104,8 +105,7 @@ namespace BlackJack.Core
 
             _decks.AddRange(CreateDeckList().OrderBy(d => _rnd.Next()));
             Decks.AddRange(_decks);
-            Croupier.Name = Croupier.CrupierNames[_rnd.Next(0, 3)];
-
+         
         }
 
 

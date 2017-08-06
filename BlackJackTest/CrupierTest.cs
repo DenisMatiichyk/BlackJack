@@ -87,13 +87,12 @@ namespace BlackJackTest
             game.NewGame();
 
             Croupier croupier = new Croupier(1);
-            croupier.TakeCard(new Card() { Name = "2", Suit = "Heart", Value = 2 });
+            croupier.TakeCard(new Card() { Name = "5", Suit = "Heart", Value = 5 });
             croupier.TakeCard(new Card() { Name = "T", Suit = "Heart", Value = 11 });
             croupier.TakeCard(new Card() { Name = "T", Suit = "Heart", Value = 11 });
             croupier.TakeCard(new Card() { Name = "T", Suit = "Heart", Value = 11 });
-            croupier.TakeCard(new Card() { Name = "3", Suit = "Heart", Value = 3 });
-
-
+            croupier.TakeCard(new Card() { Name = "10", Suit = "Heart", Value = 10 });
+            
             Assert.AreEqual(18, croupier.CalculatePoints());
         }
 
