@@ -2,9 +2,9 @@
 {
     public enum CardNamesEnum
     {
-        J,
-        Q,
-        K,
-        T
+        Jack,
+        Queen,
+        King,
+        Ace
     }
 }

@@ -29,14 +29,14 @@ namespace BlackJack.Models
             var maxValueWithAll1T = 0;
             var winPoints = 21;
 
-            if (CardPool.Count(m => m.Name == CardNamesEnum.T.ToString()) == 0)
+            if (CardPool.Count(m => m.Name == CardNamesEnum.Ace.ToString()) == 0)
             {
                 return CardPool.Sum(pool => pool.Value);
             }
             else
             {
-                var aces = CardPool.Where(c => c.Name == CardNamesEnum.T.ToString()).ToList();
-                var otherCards = CardPool.Where(c => c.Name != CardNamesEnum.T.ToString()).ToList();
+                var aces = CardPool.Where(c => c.Name == CardNamesEnum.Ace.ToString()).ToList();
+                var otherCards = CardPool.Where(c => c.Name != CardNamesEnum.Ace.ToString()).ToList();
                 var cardsWith11T = new List<Card>() {aces.First() };
                 var cardsWith1T = new List<Card>();
                 var cardsWithAll1T = new List<Card>();
@@ -56,7 +56,7 @@ namespace BlackJack.Models
 
                 int sum;
 
-                //if ace points = 11
+                // If ace points = 11
                 if (aces.Count == 1)
                 {
 
@@ -73,7 +73,7 @@ namespace BlackJack.Models
                 }
                 else if (aces.Count > 1)
                 {
-                    //if 1 ace = 11, other aces points = 1
+                    // If 1 ace = 11, other aces points = 1
                     sum = cardsWith1T.Select(c => c.Value).ToArray().Sum() + 10;
                     maxValueWith1T = sum;
 

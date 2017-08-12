@@ -24,59 +24,56 @@ namespace BlackJack.Core
         {
             var deck = new List<Card>();
             var valuesIndex = 2;
-           
-            
+            var cardsWithNumericNamesCount = 36;
+            var cardNameTypesCount = 13;
+
+            var aceSuitIndex = 0;
+            var suitIndex = 0;
 
 
-            //2,3,4,5,6,7,8,9,10
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < cardNameTypesCount; i++)
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < Enum.GetNames(typeof(SuitEnum)).Length; j++)
                 {
-                    deck.Add(
-                        new Card()
-                        {
-                            Name = valuesIndex.ToString(),
-                            Suit = ((SuitEnum)j).ToString(),
-                            Value = valuesIndex
+                    if (cardsWithNumericNamesCount > deck.Count)
+                    {
+                        deck.Add(
+                       new Card()
+                       {
+                           Name = valuesIndex.ToString(),
+                           Suit = ((SuitEnum)j).ToString(),
+                           Value = valuesIndex
 
-                        }
-                        );
-                }
-                valuesIndex++;
-            }
+                       }
+                       );
+                        continue;
+                    }
 
-            //J,Q,K,T
-
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    if (((CardNamesEnum)j) != CardNamesEnum.T)
+                    if (((CardNamesEnum)j) != CardNamesEnum.Ace)
                     {
                         deck.Add(new Card()
                         {
                             Name = ((CardNamesEnum)j).ToString(),
-                            Suit = ((SuitEnum)j).ToString(),
+                            Suit = ((SuitEnum)suitIndex).ToString(),
                             Value = 10
 
-
                         });
-
+                        continue;
                     }
-                    else
+
+                    deck.Add(new Card()
                     {
-                        deck.Add(new Card()
-                        {
-                            Name = ((CardNamesEnum)j).ToString(),
-                            Suit = ((SuitEnum)j).ToString(),
-                            Value = 11
+                        Name = CardNamesEnum.Ace.ToString(),
+                        Suit = ((SuitEnum)aceSuitIndex).ToString(),
+                        Value = 11
 
+                    });
 
-                        });
-                    }
-
+                    aceSuitIndex++;suitIndex++;
                 }
+                valuesIndex++;
+                
+
             }
 
             return deck;
@@ -105,7 +102,7 @@ namespace BlackJack.Core
 
             _decks.AddRange(CreateDeckList().OrderBy(d => _rnd.Next()));
             Decks.AddRange(_decks);
-         
+
         }
 
 
