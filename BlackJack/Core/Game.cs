@@ -15,7 +15,7 @@ namespace BlackJack.Core
         public Croupier Croupier { get; } = new Croupier(_rnd.Next(0, 3));
         public Client Client { get; } = new Client();
         public int DecksCount { get; set; }
-
+        public Messages Messages { get;} = new Messages();
         public static Random Rnd => _rnd;
 
         public static List<Card> Decks => _decks;

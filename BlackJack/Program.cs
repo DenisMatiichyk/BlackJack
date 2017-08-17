@@ -20,7 +20,7 @@ namespace BlackJack
         private static bool _isBlackJack;
         private static bool _isPush;
 
-       
+
 
         static void Main(string[] args)
         {
@@ -30,48 +30,53 @@ namespace BlackJack
         {
             if (_game.Croupier.CheckForOverflow() && !_game.Client.CheckForOverflow())
             {
-                Console.WriteLine("You WIN! Croupier has a lot of points!");
+                _game.Messages.WinPoints();
+
                 _isOverflow = true;
             }
             else if (!_game.Croupier.CheckForOverflow() && _game.Client.CheckForOverflow())
             {
-                Console.WriteLine("Defeat! You have a lot of points:(");
+                _game.Messages.LosePoints();
+
                 _isOverflow = true;
             }
 
             if (!_game.Croupier.CheckBlackJack() && _game.Client.CheckBlackJack())
             {
-                Console.WriteLine("BLACK JACK! YOU WIN!");
+                _game.Messages.WinBlackJack();
+
                 _isBlackJack = true;
             }
             else if (_game.Croupier.CheckBlackJack() && !_game.Client.CheckBlackJack())
             {
-                Console.WriteLine("Defeat! Croupier have Black Jack!");
+                _game.Messages.LoseBlackJack();
                 _isBlackJack = true;
             }
             else if (_game.Croupier.CheckBlackJack() && _game.Client.CheckBlackJack())
             {
-                Console.WriteLine("PUSH!");
+                _game.Messages.Push();
                 _isPush = true;
             }
         }
         private static void Run()
         {
+            _game.Messages.Hello();
 
-            Console.WriteLine("Hello in BlackJack game!");
-            Console.WriteLine("Type <<new game>> for configure game.");
+            _game.Messages.WriteNewGame();
+
             while (true)
             {
                 switch (Console.ReadLine())
                 {
                     case "new game"/*"new game"*/:
-                        Console.WriteLine("Enter your name.");
+                        _game.Messages.WriteName();
+
                         _game.Client.Name = Console.ReadLine();
-
-
+                        
                         while (true)
                         {
-                            Console.WriteLine("How many decks will be in the game?");
+                            _game.Messages.AskDecksCount();
+
                             try
                             {
                                 _game.DecksCount = Convert.ToInt32(Console.ReadLine());
@@ -79,7 +84,8 @@ namespace BlackJack
                             }
                             catch (FormatException)
                             {
-                                Console.WriteLine("Sorry, unknown command.");
+                                _game.Messages.UnknownCommand();
+
 
                             }
 
@@ -88,7 +94,8 @@ namespace BlackJack
                         _game.NewGame();
                         while (true)
                         {
-                            Console.WriteLine("Type <<start>> for begin game!");
+                            _game.Messages.WriteStart();
+
                             if (Console.ReadLine() == "start")
                             {
                                 do
@@ -97,20 +104,17 @@ namespace BlackJack
                                     _isOverflow = false;
                                     _isBlackJack = false;
                                     _isPush = false;
+                                    _game.Messages.GameStarted();
 
-                                    Console.WriteLine("Game started!");
                                     Thread.Sleep(1000);
-                                    Console.WriteLine("Distribution cards...");
+                                    _game.Messages.DistributionCards();
+
                                     Thread.Sleep(1500);
 
                                     _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
                                     _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
-                                    Console.WriteLine("Your points in card pool: {0}, Cards: {1} {2}, {3} {4}",
-                                        _game.Client.CalculatePoints(),
-                                        _game.Client.CardPool[0].Name,
-                                        _game.Client.CardPool[0].Suit,
-                                        _game.Client.CardPool[1].Name,
-                                        _game.Client.CardPool[1].Suit);
+                                    _game.Messages.ShowUserStartPool(_game.Client); //TODO: #1
+
 
                                     _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
                                     _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
@@ -123,16 +127,14 @@ namespace BlackJack
 
                                         do
                                         {
-                                            Console.WriteLine("Do you need the card? (yes/no)");
+                                            _game.Messages.AskNeedCard();
+
                                             switch (Console.ReadLine())
                                             {
                                                 case "yes":
                                                     _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
-                                                    Console.WriteLine("You take {0} {1}, your points now: {2}",
-                                                        _game.Client.CardPool.Last().Name,
-                                                        _game.Client.CardPool.Last().Suit,
-                                                        _game.Client.CalculatePoints());
-
+                                                    _game.Messages.ShowStatusAfterTakeCard(_game.Client);
+                                                    
                                                     CheckRules();
                                                     if (_isOverflow)
                                                     {
@@ -148,7 +150,7 @@ namespace BlackJack
                                                     _isEnd = true;
                                                     break;
                                                 default:
-                                                    Console.WriteLine("Sorry, unknown command.");
+                                                    _game.Messages.UnknownCommand();
 
                                                     break;
                                             }
@@ -158,16 +160,16 @@ namespace BlackJack
 
                                         if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
                                         {
+                                            _game.Messages.CroupierThink();
 
-                                            Console.WriteLine("Croupier thinking...");
                                             Thread.Sleep(2000);
+                                            _game.Messages.ShowCardsCountCroupierTake(_game.Croupier);
 
-                                            Console.WriteLine("Croupier take {0} card(s)",
-                                                _game.Croupier.Think());
-                                            Console.WriteLine("Calculating result...");
+                                            _game.Messages.Calculating();
+
                                             Thread.Sleep(2000);
+                                            _game.Messages.ShowCroupierStatusAfterTakeCard(_game.Croupier);
 
-                                            Console.WriteLine("Croupier points " + _game.Croupier.CalculatePoints());
 
                                             CheckRules();
 
@@ -177,13 +179,13 @@ namespace BlackJack
                                                 switch (_game.Croupier.ComparePoints(_game.Client.CalculatePoints()))
                                                 {
                                                     case "WIN!":
-                                                        Console.WriteLine("You WIN!");
+                                                        _game.Messages.WinPoints();
                                                         break;
                                                     case "LOSE!":
-                                                        Console.WriteLine("You LOSE!");
+                                                        _game.Messages.LosePoints();
                                                         break;
                                                     default:
-                                                        Console.WriteLine("PUSH!");
+                                                        _game.Messages.Push();
                                                         break;
                                                 }
                                             }
@@ -192,7 +194,8 @@ namespace BlackJack
 
                                     do
                                     {
-                                        Console.WriteLine("Would you like one more game? (yes/no)");
+                                        _game.Messages.AskOneMoreGame();
+
                                         switch (Console.ReadLine())
                                         {
                                             case "yes":
@@ -204,19 +207,21 @@ namespace BlackJack
                                                 Environment.Exit(0);
                                                 break;
                                             default:
-                                                Console.WriteLine("Sorry, unknown command.");
+                                                _game.Messages.UnknownCommand();
+
                                                 break;
                                         }
-
-
+                                        
                                     } while (!_isEnd);
 
                                 } while (true);
-                            }else { Console.WriteLine("Sorry, unknown command."); }
+                            }
+                            else
+                            { _game.Messages.UnknownCommand(); }
                         }
-                        
 
-                    default: Console.WriteLine("Sorry, unknown command."); break;
+
+                    default: _game.Messages.UnknownCommand(); break;
                 }
             }
         }
