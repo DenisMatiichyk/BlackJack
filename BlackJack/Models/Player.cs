@@ -23,82 +23,118 @@ namespace BlackJack.Models
 
         public int CalculatePoints()
         {
+            const int winPoints = 21;
+            var maxValueWithOneAce11Points = 0;
+            var maxValueWithAce11PontsOther1Points = 0;
+            var maxValueWithAllAce1Points = 0;
 
-            var maxValueWith11T = 0;
-            var maxValueWith1T = 0;
-            var maxValueWithAll1T = 0;
-            var winPoints = 21;
-
-            if (CardPool.Count(m => m.Name == CardNamesEnum.Ace.ToString()) == 0)
+            if (!IsPoolContainsAce())
             {
                 return CardPool.Sum(pool => pool.Value);
             }
-            else
+
+            // Get aces.
+            var aces = CardPool.Where(c => c.Name == CardNamesEnum.Ace.ToString()).ToList();
+
+            // Get cards without aces.
+            var otherCards = CardPool.Where(c => c.Name != CardNamesEnum.Ace.ToString()).ToList();
+
+            var cardsWithOneAce11Points = new List<Card>() { aces.First() };
+            var cardsWithAce11PontsOther1Points = new List<Card>();
+            var cardsWithAllAce1Points = new List<Card>();
+
+            cardsWithOneAce11Points.AddRange(otherCards);
+            cardsWithAce11PontsOther1Points.AddRange(otherCards);
+            cardsWithAllAce1Points.AddRange(otherCards);
+
+            var aces1 = aces.Select(card => new Card()
             {
-                var aces = CardPool.Where(c => c.Name == CardNamesEnum.Ace.ToString()).ToList();
-                var otherCards = CardPool.Where(c => c.Name != CardNamesEnum.Ace.ToString()).ToList();
-                var cardsWith11T = new List<Card>() {aces.First() };
-                var cardsWith1T = new List<Card>();
-                var cardsWithAll1T = new List<Card>();
-                cardsWith11T.AddRange(otherCards);
-                cardsWith1T.AddRange(otherCards);
-                cardsWithAll1T.AddRange(otherCards);
+                Name = card.Name,
+                Value = 1,
+                Suit = card.Suit
+            }).ToList();
 
-                var aces1 = aces.Select(card => new Card()
-                {
-                    Name = card.Name,
-                    Value = 1,
-                    Suit = card.Suit
-                }).ToList();
+            cardsWithAce11PontsOther1Points.AddRange(aces1);
+            cardsWithAllAce1Points.AddRange(new List<Card>(aces1));
 
-                cardsWith1T.AddRange(aces1);
-                cardsWithAll1T.AddRange(new List<Card>(aces1));
+            if (aces.Count == 1)
+            {
+                // If ace points = 11.
+                maxValueWithOneAce11Points = GetValueIfOneAce(cardsWithOneAce11Points, winPoints);
 
-                int sum;
+            }
+            else if (aces.Count > 1)
+            {
+                // If 1 ace = 11, other aces points = 1.
+                maxValueWithAce11PontsOther1Points = GetValueIfOneAce11Points(cardsWithAce11PontsOther1Points);
 
-                // If ace points = 11
-                if (aces.Count == 1)
-                {
+                // If all  ace = 1.
+                maxValueWithAllAce1Points = GetValueIfAllAce1Ponts(cardsWithAllAce1Points);
+            }
 
-                    sum = cardsWith11T.Select(c => c.Value).ToArray().Sum();
-                    maxValueWith11T = sum;
+            return GetNearestValue(maxValueWithOneAce11Points, maxValueWithAce11PontsOther1Points,
+                                   maxValueWithAllAce1Points, winPoints);
 
-                    sum = cardsWith11T.Select(c => c.Value).ToArray().Sum()-10;
+        }
 
-                    if (maxValueWith11T > winPoints)
-                    {
-                        maxValueWith11T = sum;
-                    }
+        private int GetNearestValue(int maxValueWithOne11PointAce, int maxValueWithAce11PontsOther1Points,
+                                    int maxValueWithAllAce1Points, int winPoints)
+        {
 
-                }
-                else if (aces.Count > 1)
-                {
-                    // If 1 ace = 11, other aces points = 1
-                    sum = cardsWith1T.Select(c => c.Value).ToArray().Sum() + 10;
-                    maxValueWith1T = sum;
+            var result1T = winPoints - maxValueWithAce11PontsOther1Points;
+            var resultAll1T = winPoints - maxValueWithAllAce1Points;
 
-                    //if all  ace = 1
-                    sum = cardsWithAll1T.Select(c => c.Value).ToArray().Sum();
-                    maxValueWithAll1T = sum;
-                }
+            var result = new[] { result1T, resultAll1T }.Where(value => value >= 0);
 
+            if ((maxValueWithAce11PontsOther1Points == 0) && (maxValueWithAllAce1Points == 0))
+            {
+                return maxValueWithOne11PointAce;
+            }
 
-
+            try
+            {
+                return winPoints - result.Min();
+            }
+            catch (InvalidOperationException)
+            {
+                return maxValueWithAllAce1Points;
             }
 
 
+        }
 
+        private int GetValueIfAllAce1Ponts(List<Card> cardsWithAllAce1Ponts)
+        {
+            // If all  ace = 1.
+            return cardsWithAllAce1Ponts.Select(c => c.Value).ToArray().Sum();
+        }
 
-            var result11T = winPoints - maxValueWith11T;
-            var result1T = winPoints - maxValueWith1T;
-            var resultAll1T = winPoints - maxValueWithAll1T;
+        private int GetValueIfOneAce11Points(List<Card> cardsWithOneAce11Points)
+        {
+            // If 1 ace = 11, other aces points = 1.
+            return cardsWithOneAce11Points.Select(c => c.Value).ToArray().Sum() + 10; // "+ 10" simulate one 
+                                                                                      // ace with 11 points.
+        }
 
-            var result = new[] { result11T, result1T, resultAll1T }.Where(value => value >= 0);
+        private int GetValueIfOneAce(List<Card> cardsWithOneAce, int winPoints)
+        {
+            var sum = cardsWithOneAce.Select(c => c.Value).ToArray().Sum();
+            var result = sum;
 
-            return winPoints - result.Min();
+            sum = cardsWithOneAce.Select(c => c.Value).ToArray().Sum() - 10; // "- 10" - because ace 
+                                                                             // value = 11, but we need 
+                                                                             // ace value = 1.
 
+            if (result > winPoints)
+            {
+                result = sum;
+            }
+            return result;
+        }
 
-
+        private bool IsPoolContainsAce()
+        {
+            return CardPool.Count(m => m.Name == CardNamesEnum.Ace.ToString()) > 0;
         }
 
         public bool CheckForOverflow()

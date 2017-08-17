@@ -64,15 +64,15 @@ namespace BlackJack.Core
                     deck.Add(new Card()
                     {
                         Name = CardNamesEnum.Ace.ToString(),
-                        Suit = ((SuitEnum)aceSuitIndex).ToString(),
+                        Suit = ((SuitEnum)suitIndex).ToString(),
                         Value = 11
 
                     });
 
-                    aceSuitIndex++;suitIndex++;
+                    suitIndex++;
                 }
                 valuesIndex++;
-                
+
 
             }
 
