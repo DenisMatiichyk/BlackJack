@@ -91,6 +91,7 @@ namespace BlackJack
 
                         }
 
+
                         _game.NewGame();
                         while (true)
                         {

@@ -105,6 +105,9 @@ namespace BlackJack.Core
 
         }
 
-
+        public void Run()
+        {
+            
+        }
     }
 }

@@ -65,9 +65,11 @@
     <Compile Include="Models\CardNamesEnum.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\Croupier.cs" />
+    <Compile Include="Models\GameStatusEnum.cs" />
     <Compile Include="Models\Messages.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Models\SuitEnum.cs" />
+    <Compile Include="Models\UserCommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
