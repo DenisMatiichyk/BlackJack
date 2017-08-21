@@ -66,160 +66,160 @@ namespace BlackJack
 
             while (true)
             {
-                switch (Console.ReadLine())
+                var userInput = Console.ReadLine();
+                if (userInput == UserCommands.NewGame)
                 {
-                    case "new game"/*"new game"*/:
-                        _game.Messages.WriteName();
+                    _game.Messages.WriteName();
 
-                        _game.Client.Name = Console.ReadLine();
-                        
-                        while (true)
+                    _game.Client.Name = Console.ReadLine();
+
+                    while (true)
+                    {
+                        _game.Messages.AskDecksCount();
+
+                        try
                         {
-                            _game.Messages.AskDecksCount();
+                            _game.DecksCount = Convert.ToInt32(Console.ReadLine());
+                            break;
+                        }
+                        catch (FormatException)
+                        {
+                            _game.Messages.UnknownCommand();
 
-                            try
-                            {
-                                _game.DecksCount = Convert.ToInt32(Console.ReadLine());
-                                break;
-                            }
-                            catch (FormatException)
-                            {
-                                _game.Messages.UnknownCommand();
-
-
-                            }
 
                         }
 
+                    }
 
-                        _game.NewGame();
-                        while (true)
+
+                    _game.NewGame();
+                    while (true)
+                    {
+                        _game.Messages.WriteStart();
+
+                        if (Console.ReadLine() == "start")
                         {
-                            _game.Messages.WriteStart();
-
-                            if (Console.ReadLine() == "start")
+                            do
                             {
-                                do
+                                _isEnd = false;
+                                _isOverflow = false;
+                                _isBlackJack = false;
+                                _isPush = false;
+                                _game.Messages.GameStarted();
+
+                                Thread.Sleep(1000);
+                                _game.Messages.DistributionCards();
+
+                                Thread.Sleep(1500);
+
+                                _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
+                                _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
+                                _game.Messages.ShowUserStartPool(_game.Client); //TODO: #1
+
+
+                                _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
+                                _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
+
+                                CheckRules();
+
+
+                                if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
                                 {
-                                    _isEnd = false;
-                                    _isOverflow = false;
-                                    _isBlackJack = false;
-                                    _isPush = false;
-                                    _game.Messages.GameStarted();
-
-                                    Thread.Sleep(1000);
-                                    _game.Messages.DistributionCards();
-
-                                    Thread.Sleep(1500);
-
-                                    _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
-                                    _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
-                                    _game.Messages.ShowUserStartPool(_game.Client); //TODO: #1
-
-
-                                    _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
-                                    _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
-
-                                    CheckRules();
-
-
-                                    if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
-                                    {
-
-                                        do
-                                        {
-                                            _game.Messages.AskNeedCard();
-
-                                            switch (Console.ReadLine())
-                                            {
-                                                case "yes":
-                                                    _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
-                                                    _game.Messages.ShowStatusAfterTakeCard(_game.Client);
-                                                    
-                                                    CheckRules();
-                                                    if (_isOverflow)
-                                                    {
-                                                        _isEnd = true;
-                                                    }
-
-                                                    if (_isBlackJack)
-                                                    {
-                                                        _isEnd = true;
-                                                    }
-                                                    break;
-                                                case "no":
-                                                    _isEnd = true;
-                                                    break;
-                                                default:
-                                                    _game.Messages.UnknownCommand();
-
-                                                    break;
-                                            }
-
-                                        } while (!_isEnd);
-                                        _isEnd = false;
-
-                                        if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
-                                        {
-                                            _game.Messages.CroupierThink();
-
-                                            Thread.Sleep(2000);
-                                            _game.Messages.ShowCardsCountCroupierTake(_game.Croupier);
-
-                                            _game.Messages.Calculating();
-
-                                            Thread.Sleep(2000);
-                                            _game.Messages.ShowCroupierStatusAfterTakeCard(_game.Croupier);
-
-
-                                            CheckRules();
-
-                                            if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
-                                            {
-
-                                                switch (_game.Croupier.ComparePoints(_game.Client.CalculatePoints()))
-                                                {
-                                                    case "WIN!":
-                                                        _game.Messages.WinPoints();
-                                                        break;
-                                                    case "LOSE!":
-                                                        _game.Messages.LosePoints();
-                                                        break;
-                                                    default:
-                                                        _game.Messages.Push();
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    }
 
                                     do
                                     {
-                                        _game.Messages.AskOneMoreGame();
+                                        _game.Messages.AskNeedCard();
 
                                         switch (Console.ReadLine())
                                         {
                                             case "yes":
-                                                _game.NewGame();
-                                                _isEnd = true;
+                                                _game.Client.TakeCard(_game.Croupier.GiveCards(1).First());
+                                                _game.Messages.ShowStatusAfterTakeCard(_game.Client);
+
+                                                CheckRules();
+                                                if (_isOverflow)
+                                                {
+                                                    _isEnd = true;
+                                                }
+
+                                                if (_isBlackJack)
+                                                {
+                                                    _isEnd = true;
+                                                }
                                                 break;
                                             case "no":
-                                                //isEnd = true;
-                                                Environment.Exit(0);
+                                                _isEnd = true;
                                                 break;
                                             default:
                                                 _game.Messages.UnknownCommand();
 
                                                 break;
                                         }
-                                        
-                                    } while (!_isEnd);
 
-                                } while (true);
-                            }
-                            else
-                            { _game.Messages.UnknownCommand(); }
+                                    } while (!_isEnd);
+                                    _isEnd = false;
+
+                                    if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
+                                    {
+                                        _game.Messages.CroupierThink();
+
+                                        Thread.Sleep(2000);
+                                        _game.Messages.ShowCardsCountCroupierTake(_game.Croupier);
+
+                                        _game.Messages.Calculating();
+
+                                        Thread.Sleep(2000);
+                                        _game.Messages.ShowCroupierStatusAfterTakeCard(_game.Croupier);
+
+
+                                        CheckRules();
+
+                                        if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
+                                        {
+
+                                            switch (_game.Croupier.ComparePoints(_game.Client.CalculatePoints()))
+                                            {
+                                                case "WIN!":
+                                                    _game.Messages.WinPoints();
+                                                    break;
+                                                case "LOSE!":
+                                                    _game.Messages.LosePoints();
+                                                    break;
+                                                default:
+                                                    _game.Messages.Push();
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                do
+                                {
+                                    _game.Messages.AskOneMoreGame();
+
+                                    switch (Console.ReadLine())
+                                    {
+                                        case "yes":
+                                            _game.NewGame();
+                                            _isEnd = true;
+                                            break;
+                                        case "no":
+                                            //isEnd = true;
+                                            Environment.Exit(0);
+                                            break;
+                                        default:
+                                            _game.Messages.UnknownCommand();
+
+                                            break;
+                                    }
+
+                                } while (!_isEnd);
+
+                            } while (true);
                         }
+                        else
+                        { _game.Messages.UnknownCommand(); }
+                    }
 
 
                     default: _game.Messages.UnknownCommand(); break;
