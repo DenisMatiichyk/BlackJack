@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlackJack.Core;
 
 namespace BlackJack.Models
 {
 
-    public class Player
+    public class Player :GameResultStates
     {
+        public IGameResultState State { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public List<Card> CardPool { get; }
+      
+        const int WinPoints = 21;
 
         protected Player()
         {
-            CardPool = new List<Card>();
+           CardPool = new List<Card>();
         }
 
+     
         public void TakeCard(Card card)
         {
             CardPool.Add(card);
@@ -23,7 +28,7 @@ namespace BlackJack.Models
 
         public int CalculatePoints()
         {
-            const int winPoints = 21;
+
             var maxValueWithOneAce11Points = 0;
             var maxValueWithAce11PontsOther1Points = 0;
             var maxValueWithAllAce1Points = 0;
@@ -60,7 +65,7 @@ namespace BlackJack.Models
             if (aces.Count == 1)
             {
                 // If ace points = 11.
-                maxValueWithOneAce11Points = GetValueIfOneAce(cardsWithOneAce11Points, winPoints);
+                maxValueWithOneAce11Points = GetValueIfOneAce(cardsWithOneAce11Points, WinPoints);
 
             }
             else if (aces.Count > 1)
@@ -73,7 +78,7 @@ namespace BlackJack.Models
             }
 
             return GetNearestValue(maxValueWithOneAce11Points, maxValueWithAce11PontsOther1Points,
-                                   maxValueWithAllAce1Points, winPoints);
+                                   maxValueWithAllAce1Points, WinPoints);
 
         }
 
@@ -139,8 +144,9 @@ namespace BlackJack.Models
 
         public bool CheckForOverflow()
         {
-            if (CalculatePoints() > 21)
+            if (CalculatePoints() > WinPoints)
             {
+               
                 return true;
 
             }
@@ -149,12 +155,11 @@ namespace BlackJack.Models
 
         public bool CheckBlackJack()
         {
-            if (CalculatePoints() == 21)
+            if (CalculatePoints() == WinPoints)
             {
                 return true;
             }
             return false;
         }
-
     }
 }

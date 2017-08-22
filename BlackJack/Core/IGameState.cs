@@ -10,7 +10,7 @@ namespace BlackJack.Core
     {
         void NewGame(Game game);
         void Start(Game game);
-        void TakeCard(Game game);
+        void GettingCards(Game game);
         void EndGame(Game game);
     }
 }

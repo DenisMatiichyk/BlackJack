@@ -10,11 +10,12 @@ namespace BlackJack.Models
 {
     public class Croupier : Player
     {
-        public Croupier(int nameIndex)
+        public Croupier(int nameIndex, IGameResultState gameState)
         {
+            State = gameState;
             Name = ((CroupierNamesEnum)nameIndex).ToString();
         }
-        
+
         private enum CroupierNamesEnum
         {
             John,
@@ -22,7 +23,7 @@ namespace BlackJack.Models
             Bill,
             Leo
         }
-        
+
         public int Think()
         {
             var takenCards = 0;
@@ -60,6 +61,7 @@ namespace BlackJack.Models
 
             if (clientPoints > croupierPoints)
             {
+                State = new Client.WinPointsState();
                 return "WIN!";
             }
 
@@ -68,8 +70,87 @@ namespace BlackJack.Models
                 return "PUSH!";
             }
 
-            return "LOSE!"; 
+            return "LOSE!";
         }
 
+        // States.
+
+        public class OverflowState : IGameResultState
+        {
+            public void CheckRules(Player player)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Default(Player player) { player.State = new DefaultState(); }
+        }
+
+        public class BlackJackState : IGameResultState
+        {
+            public void CheckRules(Player player)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Default(Player player) { player.State = new DefaultState(); }
+        }
+
+        public class PushState : IGameResultState
+        {
+            public void CheckRules(Player player)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Default(Player player) { player.State = new DefaultState(); }
+        }
+
+        public class WinPointsState:IGameResultState
+        {
+            public void CheckRules(Player player)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Default(Player player)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        public class LosePointsState : IGameResultState
+        {
+            public void CheckRules(Player player)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Default(Player player)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class DefaultState : IGameResultState
+        {
+            public void CheckRules(Player player)
+            {
+                if (player.CheckForOverflow())
+                {
+                   player.State = new OverflowState();
+                    return;
+                }
+                
+                if (player.CheckBlackJack())
+                {
+                    player.State = new BlackJackState();
+                    return;
+                }
+               
+            }
+
+            public void Default(Player player) { throw  new NotImplementedException();}
+        }
+
+        //
     }
 }

@@ -13,7 +13,7 @@ namespace BlackJack.Core
         public IGameState State { get; set; }
         private static readonly List<Card> _decks = new List<Card>();
         private static readonly Random _rnd = new Random();
-        public Croupier Croupier { get; } = new Croupier(_rnd.Next(0, 3));
+        public Croupier Croupier { get; } = new Croupier(_rnd.Next(0, 3), new Croupier.DefaultState());
         public Client Client { get; } = new Client();
         public int DecksCount { get; set; }
         public Messages Messages { get; } = new Messages();
@@ -95,19 +95,7 @@ namespace BlackJack.Core
         {
             State = gameState;
         }
-        public void NewGame1()
-        {
-            if (_decks.Any())
-            {
-                _decks.Clear();
-                Croupier.CardPool.Clear();
-                Client.CardPool.Clear();
-            }
-
-            _decks.AddRange(CreateDeckList().OrderBy(d => _rnd.Next()));
-            Decks.AddRange(_decks);
-
-        }
+        
 
         public void Run()
         {
@@ -118,105 +106,45 @@ namespace BlackJack.Core
 
         public void NewGame()
         {
-            
+            Messages.WriteName();
+
+            Client.Name = Console.ReadLine();
+
+            while (true)
+            {
+                Messages.AskDecksCount();
+
+                try
+                {
+                    DecksCount = Convert.ToInt32(Console.ReadLine());
+                    break;
+                }
+                catch (FormatException)
+                {
+                    Messages.UnknownCommand();
+                }
+
+            }
+
+            if (_decks.Any())
+            {
+                _decks.Clear();
+                Croupier.CardPool.Clear();
+                Client.CardPool.Clear();
+            }
+
+            _decks.AddRange(CreateDeckList().OrderBy(d => _rnd.Next()));
+            Decks.AddRange(_decks);
+
             State.NewGame(this);
         }
 
-        public void Start() {State.Start(this); }
+        public void Start() { State.Start(this); }
 
-        public void TakeCard() { State.TakeCard(this);}
+        public void GettingCards() { State.GettingCards(this); }
 
 
 
     }
-    class NewGame : IGameState
-    {
-        void IGameState.NewGame(Game game)
-        {
-            game.State = new StartState();
-        }
-
-        public void Start(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TakeCard(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EndGame(Game game)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class StartState:IGameState
-    {
-        public void NewGame(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Start(Game game)
-        {
-            game.State = new TakeCardState();
-        }
-
-        public void TakeCard(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EndGame(Game game)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    class TakeCardState:IGameState
-    {
-        public void NewGame(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Start(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-      public  void TakeCard(Game game)
-      {
-          game.State = new EndGameState();
-      }
-
-        public void EndGame(Game game)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    class EndGameState: IGameState
-    {
-        public void NewGame(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Start(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TakeCard(Game game)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EndGame(Game game)
-        {
-            game.State = new NewGame();
-        }
-    }
+   
 }

@@ -61,7 +61,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Game.cs" />
+    <Compile Include="Core\GameResultStates.cs" />
     <Compile Include="Core\GameStates.cs" />
+    <Compile Include="Core\IGame.cs" />
+    <Compile Include="Core\IGameResultState.cs" />
     <Compile Include="Core\IGameState.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\CardNamesEnum.cs" />

@@ -9,12 +9,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using BlackJack.Core;
 using BlackJack.Models;
+using static BlackJack.Core.GameStates;
 
 namespace BlackJack
 {
     class Program
     {
-        private static readonly Game _game = new Game();
+        private static readonly Game _game = new Game(new NewGameState());
         private static bool _isEnd;
         private static bool _isOverflow;
         private static bool _isBlackJack;
@@ -28,17 +29,19 @@ namespace BlackJack
         }
         private static void CheckRules()
         {
-            if (_game.Croupier.CheckForOverflow() && !_game.Client.CheckForOverflow())
+            if (/*_game.Croupier.CheckForOverflow() && */!_game.Client.CheckForOverflow())
             {
                 _game.Messages.WinPoints();
 
-                _isOverflow = true;
+                _isOverflow = true; // Need set state\
+                return;
             }
-            else if (!_game.Croupier.CheckForOverflow() && _game.Client.CheckForOverflow())
+            if (!_game.Croupier.CheckForOverflow() && _game.Client.CheckForOverflow())
             {
                 _game.Messages.LosePoints();
 
                 _isOverflow = true;
+                return;
             }
 
             if (!_game.Croupier.CheckBlackJack() && _game.Client.CheckBlackJack())
@@ -46,16 +49,19 @@ namespace BlackJack
                 _game.Messages.WinBlackJack();
 
                 _isBlackJack = true;
+                return;
             }
-            else if (_game.Croupier.CheckBlackJack() && !_game.Client.CheckBlackJack())
+            if (_game.Croupier.CheckBlackJack() && !_game.Client.CheckBlackJack())
             {
                 _game.Messages.LoseBlackJack();
                 _isBlackJack = true;
+                return;
             }
-            else if (_game.Croupier.CheckBlackJack() && _game.Client.CheckBlackJack())
+            if (_game.Croupier.CheckBlackJack() && _game.Client.CheckBlackJack())
             {
                 _game.Messages.Push();
                 _isPush = true;
+                return;
             }
         }
         private static void Run()
@@ -69,38 +75,17 @@ namespace BlackJack
                 var userInput = Console.ReadLine();
                 if (userInput == UserCommands.NewGame)
                 {
-                    _game.Messages.WriteName();
-
-                    _game.Client.Name = Console.ReadLine();
-
-                    while (true)
-                    {
-                        _game.Messages.AskDecksCount();
-
-                        try
-                        {
-                            _game.DecksCount = Convert.ToInt32(Console.ReadLine());
-                            break;
-                        }
-                        catch (FormatException)
-                        {
-                            _game.Messages.UnknownCommand();
-
-
-                        }
-
-                    }
-
-
                     _game.NewGame();
+
                     while (true)
                     {
                         _game.Messages.WriteStart();
 
-                        if (Console.ReadLine() == "start")
+                        if (Console.ReadLine() == UserCommands.Start)
                         {
                             do
                             {
+                                // Start
                                 _isEnd = false;
                                 _isOverflow = false;
                                 _isBlackJack = false;
@@ -121,8 +106,9 @@ namespace BlackJack
                                 _game.Croupier.TakeCard(_game.Croupier.GiveCards(1).First());
 
                                 CheckRules();
+                                //
 
-
+                                // TakeCard
                                 if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
                                 {
 
@@ -159,6 +145,8 @@ namespace BlackJack
                                     } while (!_isEnd);
                                     _isEnd = false;
 
+
+
                                     if ((!_isPush) && (!_isOverflow) && (!_isBlackJack))
                                     {
                                         _game.Messages.CroupierThink();
@@ -192,7 +180,9 @@ namespace BlackJack
                                         }
                                     }
                                 }
+                                //
 
+                                // EndGame
                                 do
                                 {
                                     _game.Messages.AskOneMoreGame();
@@ -214,15 +204,17 @@ namespace BlackJack
                                     }
 
                                 } while (!_isEnd);
+                                //
 
                             } while (true);
                         }
                         else
                         { _game.Messages.UnknownCommand(); }
+
                     }
 
 
-                    default: _game.Messages.UnknownCommand(); break;
+
                 }
             }
         }
