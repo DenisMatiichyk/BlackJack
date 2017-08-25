@@ -5,15 +5,26 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJack.Core;
+using BlackJack.States.ClientStates;
 
 namespace BlackJack.Models
 {
     public class Croupier : Player
     {
-        public Croupier(int nameIndex, IGameResultState gameState)
+        private readonly Game _game;
+        public Croupier(Game game, int nameIndex)
         {
-            State = gameState;
+            _game = game;
             Name = ((CroupierNamesEnum)nameIndex).ToString();
+
+            DefaultState = new DefaultState(_game);
+            BlackJackState = new BlackJackState();
+            WinPointsState = new WinPointsState();
+            LosePointsState = new LosePointsState();
+            PushState = new PushState();
+            OverflowState = new OverflowState();
+
+            SetState(DefaultState);
         }
 
         private enum CroupierNamesEnum
@@ -42,115 +53,42 @@ namespace BlackJack.Models
             }
 
             return takenCards;
-
-
         }
-
 
         public List<Card> GiveCards(int count)
         {
-            var cards = Game.Decks.Take(count).ToList();
-            Game.Decks.RemoveRange(0, count);
+            var cards = _game.Decks.Take(count).ToList();
+            _game.Decks.RemoveRange(0, count);
             return cards;
         }
 
 
-        public string ComparePoints(int clientPoints) //1 enum state?
+        public void  ComparePoints(int clientPoints) //1 enum state?
         {
             var croupierPoints = CalculatePoints();
 
             if (clientPoints > croupierPoints)
             {
-                State = new Client.WinPointsState();
-                return "WIN!";
+                this.SetState(this.LosePointsState);
+                _game.Client.SetState(_game.Client.WinPointsState);
+                _game.Messages.WinPoints();
+                return;
             }
 
             if (clientPoints == croupierPoints)
             {
-                return "PUSH!";
+                this.SetState(this.PushState);
+                _game.Client.SetState(_game.Client.PushState);
+                _game.Messages.Push();
+                return;
             }
 
-            return "LOSE!";
+            this.SetState(this.WinPointsState);
+            _game.Client.SetState(_game.Client.LosePointsState);
+            _game.Messages.LosePoints();
+            
         }
+      
 
-        // States.
-
-        public class OverflowState : IGameResultState
-        {
-            public void CheckRules(Player player)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Default(Player player) { player.State = new DefaultState(); }
-        }
-
-        public class BlackJackState : IGameResultState
-        {
-            public void CheckRules(Player player)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Default(Player player) { player.State = new DefaultState(); }
-        }
-
-        public class PushState : IGameResultState
-        {
-            public void CheckRules(Player player)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Default(Player player) { player.State = new DefaultState(); }
-        }
-
-        public class WinPointsState:IGameResultState
-        {
-            public void CheckRules(Player player)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Default(Player player)
-            {
-                throw new NotImplementedException();
-            }
-        }
-        public class LosePointsState : IGameResultState
-        {
-            public void CheckRules(Player player)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Default(Player player)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public class DefaultState : IGameResultState
-        {
-            public void CheckRules(Player player)
-            {
-                if (player.CheckForOverflow())
-                {
-                   player.State = new OverflowState();
-                    return;
-                }
-                
-                if (player.CheckBlackJack())
-                {
-                    player.State = new BlackJackState();
-                    return;
-                }
-               
-            }
-
-            public void Default(Player player) { throw  new NotImplementedException();}
-        }
-
-        //
     }
 }

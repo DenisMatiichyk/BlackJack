@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Core\Game.cs" />
     <Compile Include="Core\GameResultStates.cs" />
-    <Compile Include="Core\GameStates.cs" />
     <Compile Include="Core\IGame.cs" />
     <Compile Include="Core\IGameResultState.cs" />
     <Compile Include="Core\IGameState.cs" />
@@ -77,6 +76,17 @@
     <Compile Include="Models\UserCommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="States\ClientStates\BlackJackState.cs" />
+    <Compile Include="States\ClientStates\DefaultState.cs" />
+    <Compile Include="States\ClientStates\LosePointsState.cs" />
+    <Compile Include="States\ClientStates\OverflowState.cs" />
+    <Compile Include="States\ClientStates\PushState.cs" />
+    <Compile Include="States\ClientStates\WinPointsState.cs" />
+    <Compile Include="States\GameStates\ComparePointsState.cs" />
+    <Compile Include="States\GameStates\EndGameState.cs" />
+    <Compile Include="States\GameStates\GettingCardsState.cs" />
+    <Compile Include="States\GameStates\SetupState.cs" />
+    <Compile Include="States\GameStates\StartState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -93,6 +103,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

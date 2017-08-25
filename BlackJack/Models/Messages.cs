@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJack.Core;
-    
+
 namespace BlackJack.Models
 {
-    public  class Messages
+    public class Messages
     {
 
         public void Hello() { Console.WriteLine("Hello in BlackJack game!"); }
@@ -50,13 +50,14 @@ namespace BlackJack.Models
         {
             Console.WriteLine("Calculating result...");
         }
-        public static void WinPoints() { Console.WriteLine("You WIN! Croupier has a lot of points!"); }
-        public static void LosePoints() { Console.WriteLine("Defeat! Croupier has more points:("); }
-        public static void LoseOverflow() { Console.WriteLine("Defeat! You have a lot of points:("); }
-        public static void WinBlackJack() { Console.WriteLine("BLACK JACK! YOU WIN!"); }
-        public static void LoseBlackJack() { Console.WriteLine("Defeat! Croupier have Black Jack!"); }
-        public static void Push() { Console.WriteLine("PUSH!"); }
-        public static void AskOneMoreGame() { Console.WriteLine("Would you like one more game? (yes/no)"); }
+        public void WinPoints() { Console.WriteLine("You WIN! Croupier has a lot of points!"); }
+        public void LosePoints() { Console.WriteLine("Defeat! Croupier has more points:("); }
+        public void LoseOverflow() { Console.WriteLine("Defeat! You have a lot of points:("); }
+        public void WinOverflow() { Console.WriteLine("You Win! Croupier has overflow!"); }
+        public void WinBlackJack() { Console.WriteLine("BLACK JACK! YOU WIN!"); }
+        public void LoseBlackJack() { Console.WriteLine("Defeat! Croupier have Black Jack!"); }
+        public void Push() { Console.WriteLine("PUSH!"); }
+        public void AskOneMoreGame() { Console.WriteLine("Would you like one more game? (yes/no)"); }
 
 
 

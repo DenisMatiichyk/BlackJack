@@ -2,25 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlackJack.Core;
+using BlackJack.States.ClientStates;
 
 namespace BlackJack.Models
 {
 
-    public class Player :GameResultStates
+    public class Player : GameResultStates
     {
-        public IGameResultState State { get; set; }
+        private IGameResultState _currentState { get; set; }
+        
+        public DefaultState DefaultState { get; protected set; }
+        public BlackJackState BlackJackState { get; protected set; }
+        public WinPointsState WinPointsState { get; protected set; }
+        public LosePointsState LosePointsState { get; protected set; }
+        public PushState PushState { get; protected set; }
+        public OverflowState OverflowState { get; protected set; }
+        
         public int Id { get; set; }
         public string Name { get; set; }
         public List<Card> CardPool { get; }
-      
+
         const int WinPoints = 21;
 
         protected Player()
         {
-           CardPool = new List<Card>();
+            CardPool = new List<Card>();
+          
         }
 
-     
+
         public void TakeCard(Card card)
         {
             CardPool.Add(card);
@@ -146,7 +156,7 @@ namespace BlackJack.Models
         {
             if (CalculatePoints() > WinPoints)
             {
-               
+
                 return true;
 
             }
@@ -160,6 +170,20 @@ namespace BlackJack.Models
                 return true;
             }
             return false;
+        }
+
+        public void SetState(IGameResultState gameResultState)
+        {
+            _currentState = gameResultState;
+        }
+        public IGameResultState GetState()
+        {
+            return _currentState;
+        }
+
+        public void CheckRules()
+        {
+            GetState().CheckRules(this);
         }
     }
 }

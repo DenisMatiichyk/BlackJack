@@ -8,7 +8,7 @@ namespace BlackJack.Core
 {
     interface IGame
     {
-        void State();
-        void 
+        void IsPlayers();
+
     }
 }

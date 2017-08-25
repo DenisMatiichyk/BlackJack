@@ -4,21 +4,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJack.Models;
+using BlackJack.States.ClientStates;
+using BlackJack.States.GameStates;
 
 namespace BlackJack.Core
 {
     public class Game
     {
 
-        public IGameState State { get; set; }
-        private static readonly List<Card> _decks = new List<Card>();
-        private static readonly Random _rnd = new Random();
-        public Croupier Croupier { get; } = new Croupier(_rnd.Next(0, 3), new Croupier.DefaultState());
-        public Client Client { get; } = new Client();
+        private IGameState _currentState;
+
+        public SetupState SetupState { get; }
+        public StartState StartState { get; }
+        public GettingCardsState GettingCardsState { get; }
+        public ComparePointsState ComparePointsState { get; }
+        public EndGameState EndGameState { get; }
+
+        public Croupier Croupier { get; }
+        public Client Client { get; }
         public int DecksCount { get; set; }
         public Messages Messages { get; } = new Messages();
-        public static Random Rnd => _rnd;
-        public static List<Card> Decks => _decks;
+        public Random Rnd => _rnd;
+        public List<Card> Decks => _decks;
+        public static readonly List<Card> _decks = new List<Card>();
+        private static readonly Random _rnd = new Random();
+
+        public Game()
+        {
+            Client = new Client(this);
+            Croupier = new Croupier(this,_rnd.Next(0, 3));
+
+            SetupState = new SetupState(this);
+            StartState = new StartState(this);
+            GettingCardsState = new GettingCardsState(this);
+            ComparePointsState = new ComparePointsState(this);
+            EndGameState = new EndGameState(this);
+
+            _currentState = SetupState;
+           
+        }
 
         private List<Card> CreateDeck()
         {
@@ -79,7 +103,7 @@ namespace BlackJack.Core
             return deck;
         }
 
-        private List<Card> CreateDeckList()
+        public List<Card> CreateDeckList()
         {
             var deckList = new List<Card>();
 
@@ -91,11 +115,8 @@ namespace BlackJack.Core
             return deckList;
         }
 
-        public Game(IGameState gameState)
-        {
-            State = gameState;
-        }
-        
+
+
 
         public void Run()
         {
@@ -106,45 +127,25 @@ namespace BlackJack.Core
 
         public void NewGame()
         {
-            Messages.WriteName();
-
-            Client.Name = Console.ReadLine();
-
-            while (true)
-            {
-                Messages.AskDecksCount();
-
-                try
-                {
-                    DecksCount = Convert.ToInt32(Console.ReadLine());
-                    break;
-                }
-                catch (FormatException)
-                {
-                    Messages.UnknownCommand();
-                }
-
-            }
-
-            if (_decks.Any())
-            {
-                _decks.Clear();
-                Croupier.CardPool.Clear();
-                Client.CardPool.Clear();
-            }
-
-            _decks.AddRange(CreateDeckList().OrderBy(d => _rnd.Next()));
-            Decks.AddRange(_decks);
-
-            State.NewGame(this);
+            _currentState.Setup();
         }
 
-        public void Start() { State.Start(this); }
+        public void Start() { _currentState.Start(); }
 
-        public void GettingCards() { State.GettingCards(this); }
+        public void GettingCards() { _currentState.GettingCards(); }
+        public void ComparePoints() { _currentState.ComparePoints(); }
+        public void EndGame() { _currentState.EndGame(); }
 
-
+        public void SetState(IGameState gameState)
+        {
+            _currentState = gameState;
+        }
+        public bool IsPlayersDefaultState()
+        {
+            return ((Croupier.GetState() is DefaultState) && // ?
+                    (Client.GetState() is DefaultState));
+        }
 
     }
-   
+
 }

@@ -8,9 +8,10 @@ namespace BlackJack.Core
 {
     public interface IGameState
     {
-        void NewGame(Game game);
-        void Start(Game game);
-        void GettingCards(Game game);
-        void EndGame(Game game);
+        void Setup();
+        void Start();
+        void GettingCards();
+        void ComparePoints();
+        void EndGame();
     }
 }
